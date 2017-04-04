@@ -2,7 +2,7 @@
   "name": "scrapinby",
   "version": "0.0.1",
   "description": "Using MongoDB, Mongoose and Cheerio with node to create an app that allows users to comment on News items scraped from the web.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
