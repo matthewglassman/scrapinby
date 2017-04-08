@@ -14,4 +14,4 @@ var NewsAndReviewsSchema = new Schema({
 
 });
 
-module.export = mongoose.model();
+module.export = mongoose.model('News', NewsAndReviewsSchema);

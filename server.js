@@ -1,12 +1,33 @@
-var express = require('express');
+var express = require("express");
 
-var bodyParser = require('body-parser');
-var request = require('request');
-var cheerio = require('cheerio');
+var bodyParser = require("body-parser");
+var request = require("request");
+var cheerio = require("cheerio");
+var mongoose = require("mongoose");
 
-// var app = express();
+var News = require("./models/newsandreviews.js");
+var Comments = require("./models/comments.js");
 
-// var PORT = process.env.PORT || 8080;
+mongoose.Promise = Promise;
+
+var app = express();
+
+app.use(bodyParser.urlencoded({extended:false}));
+
+app.use(express.static("public"));
+
+mongoose.connect("mongodb://localhost/scrapinby");
+var db = mongoose.connection;
+
+db.on("error", function(err){
+	console.log("Mongoose Say: ", err);
+});
+
+db.once("open", function(){
+	console.log("Winner Winner Chicken Dinner!");
+});
+
+var PORT = process.env.PORT || 8080;
 
 var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
