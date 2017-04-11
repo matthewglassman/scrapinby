@@ -29,27 +29,37 @@ db.once("open", function(){
 
 var PORT = process.env.PORT || 8080;
 
-var url = "http://www.newsobserver.com/news/local/"; //website to scrape
+app.get("/scrape", function(req, res){
+	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
 	request(url, function(err, resp, body){
 		var $ = cheerio.load(body);
 
-		var result = [];
+		var result = {};
 
 		$("article").each(function(i, element){
 
-			var title = $(this).find("h4").find("a").text();
+			var result.title = $(this).find("h4").find("a").text();
 
-			var link = $(this).find("h4").find("a").attr("href");
+			var result.link = $(this).find("h4").find("a").attr("href");
 
-			result.push({
-				title: title,
-				link: link,
+			var entry = new newsandreviews(result);
+
+			entry.save(function(err, data){
+				if(err) {
+					console.log(err);
+				}else{
+					console.log(data);
+				}
 			});
+			// result.push({
+			// 	title: title,
+			// 	link: link,
+			// });
 		});
-		console.log(result);
-
 	});
+	res.send("Done Scrapin");
+});
 
 // app.listen(PORT, function(){
 // 	console.log("The app is listening on port" + PORT);
