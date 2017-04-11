@@ -61,6 +61,46 @@ app.get("/scrape", function(req, res){
 	res.send("Done Scrapin");
 });
 
+app.get("/scrapedarticles", function(req, res){
+	newsandreviews.find({}, function(error, articles){
+		if(error){
+			console.log(error);
+		}else{
+			res.json(articles);
+		}
+	});
+});
+
+app.get("/articles/:id", function(req, res){
+	newsandreviews.findOne({"_id": req.params.id})
+	.populate("comments")
+	.exec(function(error, article){
+		if (error){
+			console.log(error);
+		}else{
+			res.json(article)
+		}
+	});
+});
+
+app.post("/articles/:id", function(req, res){
+	var newComment = new Comment(req.body);
+
+	newComment.save(function(error, comment){
+		if(error){
+			console.log(error);
+		}else{
+			newsandreviews.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
+			.exec(function(err, doc){
+				if (err) {
+					console.log(err);
+				}else{
+					res.send(doc);
+				}
+			})
+		}
+	})
+})
 // app.listen(PORT, function(){
 // 	console.log("The app is listening on port" + PORT);
 // });
