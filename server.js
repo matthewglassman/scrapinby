@@ -99,8 +99,22 @@ app.post("/articles/:id", function(req, res){
 				}
 			})
 		}
+	});
+});
+
+app.get("/delete/:id", function(req, res){
+	scrapedarticles.remove({
+		"_id": req.params.id
 	})
-})
-// app.listen(PORT, function(){
-// 	console.log("The app is listening on port" + PORT);
-// });
+	.exec(function(err, doc){
+		if (err){
+			console.log(err);			
+		}else{
+			res.send(doc);
+		}
+	});
+});
+
+app.listen(PORT, function(){
+	console.log("The app is listening on port" + PORT);
+});
