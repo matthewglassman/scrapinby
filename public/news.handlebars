@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>News and Reviews Scraper</title>
 </head>
 <body>
 {{#each News}}
 	<div class="panel panel-primary">
- 	 <div class="panel-body">
+ 	 <div class="panel-body" id="newstitle">
     	{{this.title}}
-    	<button type="submit" class="btn btn-success right">Save Article</button>
+    	<button type="submit" class="btn btn-success align-right" id="save" data-id="{{this.id}}">Save Article Info</button>
   	</div>
-  	<div class="panel-footer">{{this.link}}</div>
+  	<div class="panel-footer" id="newslink">{{this.link}}</div>
 	</div>
 {{/each}}
 </body>
