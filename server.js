@@ -8,6 +8,8 @@ var mongoose = require("mongoose");
 var News = require("./models/newsandreviews.js");
 var Comments = require("./models/comments.js");
 
+var PORT = process.env.PORT || 8080;
+
 mongoose.Promise = Promise;
 
 var app = express();
@@ -18,7 +20,7 @@ app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
 
-require("./routes/apiroutes.js")(app);
+//require("./routes/apiroutes.js")(app);
 
 mongoose.connect("mongodb://localhost/scrapinby");
 var db = mongoose.connection;
@@ -31,94 +33,107 @@ db.once("open", function(){
 	console.log("Winner Winner Chicken Dinner!");
 });
 
-var PORT = process.env.PORT || 8080;
 
 
-// app.get("/scrape", function(req, res){
-// 	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
-// 	request(url, function(err, resp, body){
-// 		var $ = cheerio.load(body);
+app.get("/scrape", function(req, res){
+	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
-// 		var result = {};
+	request(url, function(err, resp, body){
+		var $ = cheerio.load(body);
 
-// 		$("article").each(function(i, element){
+		
 
-// 			var title = $(this).find("h4").find("a").text();
+		$("article").each(function(i, element){
+			var result = {};
 
-// 			var link = $(this).find("h4").find("a").attr("href");
+			var result.title = $(this).find("h4").find("a").text();
 
-// 			var entry = new newsandreviews(result);
+			var result.link = $(this).find("h4").find("a").attr("href");
 
-// 			entry.save(function(err, data){
-// 				if(err) {
-// 					console.log(err);
-// 				}else{
-// 					console.log(data);
-// 				}
-// 			});
-// 			// result.push({
-// 			// 	title: title,
-// 			// 	link: link,
-// 			// });
-// 		});
-// 	});
-// 	res.send("Done Scrapin");
-// });
+			var entry = new News(result);
 
-// app.get("/scrapedarticles", function(req, res){
-// 	News.find({}, function(error, articles){
-// 		if(error){
-// 			console.log(error);
-// 		}else{
-// 			res.json(articles);
-// 		}
-// 	});
-// });
+			console.log(entry);
 
-// app.get("/articles/:id", function(req, res){
-// 	News.findOne({"_id": req.params.id})
-// 	.populate("comments")
-// 	.exec(function(error, article){
-// 		if (error){
-// 			console.log(error);
-// 		}else{
-// 			res.json(article)
-// 		}
-// 	});
-// });
+			entry.save(function(err, data){
+				if(err) {
+					console.log(err);
+				}else{
+					console.log(data);
+				}
+			});
+			// result.push({
+			// 	title: title,
+			// 	link: link,
+			// });
+		});
+	});
+	res.send("Done Scrapin");
+});
 
-// app.post("/articles/:id", function(req, res){
-// 	var newComment = new Comments(req.body);
+app.get("/articles", function(req, res){
+	News.find({}, function(error, articles){
+		if(error){
+			console.log(error);
+		}else{
+			res.render("news", {News: articles});
+		}
+	});
+});
 
-// 	newComment.save(function(error, comment){
-// 		if(error){
-// 			console.log(error);
-// 		}else{
-// 			News.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
-// 			.exec(function(err, doc){
-// 				if (err) {
-// 					console.log(err);
-// 				}else{
-// 					res.send(doc);
-// 				}
-// 			})
-// 		}
-// 	});
-// });
+app.get("/articles/:id", function(req, res){
+	News.findOne({"_id": req.params.id})
+	.populate("comments")
+	.exec(function(error, article){
+		if (error){
+			console.log(error);
+		}else{
+			res.json(article)
+		}
+	});
+});
 
-// app.get("/delete/:id", function(req, res){
-// 	News.remove({
-// 		"_id": req.params.id
-// 	})
-// 	.exec(function(err, doc){
-// 		if (err){
-// 			console.log(err);			
-// 		}else{
-// 			res.send(doc);
-// 		}
-// 	});
-// });
+app.post("/articles/:id", function(req, res){
+	var newComment = new Comments(req.body);
+
+	newComment.save(function(error, comment){
+		if(error){
+			console.log(error);
+		}else{
+			News.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
+			.exec(function(err, doc){
+				if (err) {
+					console.log(err);
+				}else{
+					res.send(doc);
+				}
+			})
+		}
+	});
+});
+
+app.get("/delete/:id", function(req, res){
+	News.remove({
+		"_id": req.params.id
+	})
+	.exec(function(err, doc){
+		if (err){
+			console.log(err);			
+		}else{
+			res.send(doc);
+		}
+	});
+});
+
+app.get("/saved", function(req,res){
+	Comments.find({}, function(error, doc){
+		if(error){
+			console.log(error);
+		}else{
+			res.render("saved", {Comments: doc});
+		}
+	});
+});
 
 app.listen(PORT, function(){
 	console.log("The app is listening on port" + PORT);
