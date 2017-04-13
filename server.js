@@ -62,7 +62,7 @@ app.get("/scrape", function(req, res){
 });
 
 app.get("/scrapedarticles", function(req, res){
-	newsandreviews.find({}, function(error, articles){
+	News.find({}, function(error, articles){
 		if(error){
 			console.log(error);
 		}else{
@@ -72,7 +72,7 @@ app.get("/scrapedarticles", function(req, res){
 });
 
 app.get("/articles/:id", function(req, res){
-	newsandreviews.findOne({"_id": req.params.id})
+	News.findOne({"_id": req.params.id})
 	.populate("comments")
 	.exec(function(error, article){
 		if (error){
@@ -84,13 +84,13 @@ app.get("/articles/:id", function(req, res){
 });
 
 app.post("/articles/:id", function(req, res){
-	var newComment = new Comment(req.body);
+	var newComment = new Comments(req.body);
 
 	newComment.save(function(error, comment){
 		if(error){
 			console.log(error);
 		}else{
-			newsandreviews.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
+			News.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
 			.exec(function(err, doc){
 				if (err) {
 					console.log(err);
@@ -103,7 +103,7 @@ app.post("/articles/:id", function(req, res){
 });
 
 app.get("/delete/:id", function(req, res){
-	scrapedarticles.remove({
+	News.remove({
 		"_id": req.params.id
 	})
 	.exec(function(err, doc){
