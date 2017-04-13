@@ -1,6 +1,6 @@
 //Functionality for pushing items to the database and deleting them from the database.
 $("#scraperbutton").on("click", function(){
-	$.get("/articles", function(news){});
+	$.get("/news", function(data){});
 });
 
 $("#savedarticles").on("click", function(){

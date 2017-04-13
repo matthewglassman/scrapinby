@@ -1,5 +1,5 @@
 var express = require("express");
-
+var exphbs = require('express-handlebars');
 var bodyParser = require("body-parser");
 var request = require("request");
 var cheerio = require("cheerio");
@@ -47,9 +47,9 @@ app.get("/scrape", function(req, res){
 		$("article").each(function(i, element){
 			var result = {};
 
-			var result.title = $(this).find("h4").find("a").text();
+			result.title = $(element).find("h4").find("a").text();
 
-			var result.link = $(this).find("h4").find("a").attr("href");
+			result.link = $(element).find("h4").find("a").attr("href");
 
 			var entry = new News(result);
 
@@ -69,6 +69,10 @@ app.get("/scrape", function(req, res){
 		});
 	});
 	res.send("Done Scrapin");
+});
+
+app.get("/", function (req, res){
+	res.render("index");
 });
 
 app.get("/articles", function(req, res){
