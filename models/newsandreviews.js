@@ -5,7 +5,10 @@ var Schema = mongoose.Schema; //set the mongoose Schema method to a variable cal
 var NewsAndReviewsSchema = new Schema({
 	title: String,
 	link: String,
-	saved: Boolean,
+	saved:{
+		type: Boolean,
+		default: false
+	},
 	comments:[{
 		type: Schema.ObjectId,
 		ref: 'Comment'
