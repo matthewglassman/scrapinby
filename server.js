@@ -68,6 +68,7 @@ app.get("/scrape", function(req, res){
 		}
 		res.render("index", handlebarsObject);
 	});
+	// now need to save freshly scraped articles to db.
 	// 		var entry = new News(result);
 
 	// 		console.log(entry);
@@ -88,12 +89,31 @@ app.get("/scrape", function(req, res){
 	// res.send("Done Scrapin");
 });
 
-app.get("/articles", function(req, res){
-	News.find({}, function(error, articles){
+//save a news article
+app.post('/api/saveanarticle', function(req, res){
+
+	//create a new instance of the news and reviews schema
+	var entryinDB = new News(req.body);
+
+	News.save(function(err, doc){
+		if(err){
+			console.log(err);
+		}
+	});
+});
+
+app.get("/api/saveanarticle", function(req, res){
+	News.find({}, function(error, News){
 		if(error){
 			console.log(error);
 		}else{
-			res.render("news", {News: articles});
+			var handlebarsObject = {
+				savedDIV: true,
+				KeptNews: News
+
+			};
+
+			res.render("news", hbsObject);
 		}
 	});
 });
