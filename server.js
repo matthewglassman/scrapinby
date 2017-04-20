@@ -40,7 +40,7 @@ app.get("/", function (req, res){
 
 
 //When user clicks Scrape for New Articles this route will handle that call.
-app.get("/scrape", function(req, res){
+app.get("/scrapeit", function(req, res){
 	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
 	request(url, function(err, resp, body){
