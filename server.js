@@ -113,7 +113,7 @@ app.get("/api/saveanarticle", function(req, res){
 
 			};
 
-			res.render("news", hbsObject);
+			res.render("news", handbarsObject);
 		}
 	});
 });
