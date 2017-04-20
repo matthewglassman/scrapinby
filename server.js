@@ -90,7 +90,7 @@ app.get("/scrape", function(req, res){
 });
 
 //save a news article
-app.post('/api/saveanarticle', function(req, res){
+app.post('/api/savingnews', function(req, res){
 
 	//create a new instance of the news and reviews schema
 	var entryinDB = new News(req.body);
@@ -102,7 +102,8 @@ app.post('/api/saveanarticle', function(req, res){
 	});
 });
 
-app.get("/api/saveanarticle", function(req, res){
+//get saved articles from the DB
+app.get("/api/savednews", function(req, res){
 	News.find({}, function(error, News){
 		if(error){
 			console.log(error);
@@ -118,59 +119,68 @@ app.get("/api/saveanarticle", function(req, res){
 	});
 });
 
-app.get("/articles/:id", function(req, res){
+//route for saving comments
+app.post("/api/comments/:id", funciton(req, res){
+
+	var newComment = new Comment(req.body);
+	var id = req.params.id;
+
+	newComment.save(function(error, comment){
+		if(error){
+			console.log("You tried to save a comment but " + error);
+		}else{
+			//find News Story to associate with this comment and update it with a new comment
+			News.findOneAndUpdate({"_id":req.params.id}, {$push: {"comments": doc._id}}, {new: true})
+			.exec(function(error, comment){
+				if (error){
+					console.log(err);
+				}else{
+					console.log(comment);
+				}
+			});
+		}
+	});
+});
+
+//route for returning saved comments and news article for a news item
+app.get("/api/savedcomment/:id", function(req, res){
 	News.findOne({"_id": req.params.id})
 	.populate("comments")
 	.exec(function(error, article){
 		if (error){
 			console.log(error);
 		}else{
+			sonsole.log(article)
 			res.json(article)
 		}
 	});
 });
 
-app.post("/articles/:id", function(req, res){
-	var newComment = new Comments(req.body);
-
-	newComment.save(function(error, comment){
-		if(error){
+//route for removing comments
+app.delete("/api/removecomment/:id", function(req, res){
+	Comments.findByIdAndRemove(req.params.id, function(error){
+		if (error){
 			console.log(error);
+			res.send("Can not delete this because " + error);
 		}else{
-			News.findOneAndUpdate({"_id": req.params.id}, {"comments": comment._id})
-			.exec(function(err, doc){
-				if (err) {
-					console.log(err);
-				}else{
-					res.send(doc);
-				}
-			})
+			console.log("The comment has been removed");
 		}
 	});
 });
 
-app.get("/delete/:id", function(req, res){
-	News.remove({
-		"_id": req.params.id
-	})
-	.exec(function(err, doc){
-		if (err){
-			console.log(err);			
-		}else{
-			res.send(doc);
-		}
-	});
-});
-
-app.get("/saved", function(req,res){
-	Comments.find({}, function(error, doc){
-		if(error){
+//route for removing saved News Article
+app.delete("/api/removenews/:id", function(req, res){
+	News.findByIdAndRemove(req.params.id, function(error){
+		if (error){
 			console.log(error);
+			res.send("Can not remove this article because " + error);
 		}else{
-			res.render("saved", {Comments: doc});
+			console.log(Article removed);
+			res.redirect("/news");
 		}
 	});
 });
+
 
 app.listen(PORT, function(){
 	console.log("The app is listening on port" + PORT);
