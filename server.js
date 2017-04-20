@@ -33,46 +33,59 @@ db.once("open", function(){
 	console.log("Winner Winner Chicken Dinner!");
 });
 
+//When user requests the root, this route gets request and returns index or index.handlebars in this case.
+app.get("/", function (req, res){
+	res.render("index");
+});
 
 
-
+//When user clicks Scrape for New Articles this route will handle that call.
 app.get("/scrape", function(req, res){
 	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 
 	request(url, function(err, resp, body){
-		var $ = cheerio.load(body);
+		var $ = cheerio.load(body); //load the body of the document into Cheerio and assign it to $
 
 		
 
 		$("article").each(function(i, element){
-			var result = {};
+			var result = [];
 
 			result.title = $(element).find("h4").find("a").text();
 
 			result.link = $(element).find("h4").find("a").attr("href");
 
-			var entry = new News(result);
-
-			console.log(entry);
-
-			entry.save(function(err, data){
-				if(err) {
-					console.log(err);
-				}else{
-					console.log(data);
-				}
+			result.push({
+				title: result.title,
+				link: result.link
 			});
-			// result.push({
-			// 	title: title,
-			// 	link: link,
-			// });
 		});
-	});
-	res.send("Done Scrapin");
-});
 
-app.get("/", function (req, res){
-	res.render("index");
+		var handlebarsObject = {
+			scraped: true,
+			News: result
+
+		}
+		res.render("index", handlebarsObject);
+	});
+	// 		var entry = new News(result);
+
+	// 		console.log(entry);
+
+	// 		entry.save(function(err, data){
+	// 			if(err) {
+	// 				console.log(err);
+	// 			}else{
+	// 				console.log(data);
+	// 			}
+	// 		});
+	// 		// result.push({
+	// 		// 	title: title,
+	// 		// 	link: link,
+	// 		// });
+	// 	});
+	// });
+	// res.send("Done Scrapin");
 });
 
 app.get("/articles", function(req, res){
