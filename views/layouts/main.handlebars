@@ -6,14 +6,21 @@
 		<title>News and Reviews Scraper</title>
 	</head>
 	<body>
-		<header class="header">
-			<h1 class="headline">NANDO Scraper</h1>
+		<div class="jumbotron">
+  			<div class="container">
+    			<h1>News and Observer Scraper</h1>
+    			<h3>Local News Edition</h3>
+  			</div>
+		
+		{{!-- <header class="header">
+			<h1 class="headline">NANDO Scraper</h1> --}}
 			<a href="/scrapeit" class="button" id="scraper">Get The News!</a>
 			<ul class="subnav">
 				<li><a href="/" {{#if Home}} class="active" {{/if}}>Home</a></li>
 				<li><a href="/news" {{#if savedDIV}} class="active" {{/if}}>Saved News</a></li>
 			</ul>
-		</header>
+		</div>
+		{{!-- </header> --}}
 		{{{ body }}}
 		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 		<script src="/public/app.js"></script>
