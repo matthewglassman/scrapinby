@@ -42,23 +42,27 @@ app.get("/", function (req, res){
 //When user clicks Scrape for New Articles this route will handle that call.
 app.get("/scrapeit", function(req, res){
 	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
-
+	
+	var result = [];
+	
 	request(url, function(err, resp, body){
 		var $ = cheerio.load(body); //load the body of the document into Cheerio and assign it to $
 
-		
-
 		$("article").each(function(i, element){
-			var result = [];
+			
 
-			result.title = $(element).find("h4").find("a").text();
+			var title = $(element).find("h4").find("a").text();
 
-			result.link = $(element).find("h4").find("a").attr("href");
+			var link = $(element).find("h4").find("a").attr("href");
 
-			result.push({
-				title: result.title,
-				link: result.link
-			});
+			var id = i
+
+			var scrapedNews = {
+				"title": title,
+				"link": link
+				"id": id
+			}
+			result.push(scrapedNews);
 		});
 
 		var handlebarsObject = {
@@ -103,7 +107,7 @@ app.post('/api/savingnews', function(req, res){
 });
 
 //get saved articles from the DB
-app.get("/api/savednews", function(req, res){
+app.get("/savednews", function(req, res){
 	News.find({}, function(error, News){
 		if(error){
 			console.log(error);
@@ -120,7 +124,7 @@ app.get("/api/savednews", function(req, res){
 });
 
 //route for saving comments
-app.post("/api/comments/:id", funciton(req, res){
+app.post("/api/comments/:id", function(req, res){
 
 	var newComment = new Comment(req.body);
 	var id = req.params.id;
