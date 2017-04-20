@@ -21,8 +21,13 @@ app.set("view engine", "handlebars");
 app.use(express.static("public"));
 
 //require("./routes/apiroutes.js")(app);
+var databaseURL = "mongodb://localhost/scrapinby";
+if (process.env.MONGODB_URI){
+	mongoose.connect(process.env.MONGODB_URI);
+}else{
+	mongoose.connect(databaseURL);
+}
 
-mongoose.connect("mongodb://localhost/scrapinby");
 var db = mongoose.connection;
 
 db.on("error", function(err){
@@ -55,11 +60,11 @@ app.get("/scrapeit", function(req, res){
 
 			var link = $(element).find("h4").find("a").attr("href");
 
-			var id = i
+			var id = i;
 
 			var scrapedNews = {
 				"title": title,
-				"link": link
+				"link": link,
 				"id": id
 			}
 			result.push(scrapedNews);
@@ -179,7 +184,7 @@ app.delete("/api/removenews/:id", function(req, res){
 			console.log(error);
 			res.send("Can not remove this article because " + error);
 		}else{
-			console.log(Article removed);
+			console.log("Article removed");
 			res.redirect("/news");
 		}
 	});

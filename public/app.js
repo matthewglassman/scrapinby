@@ -11,7 +11,9 @@ $(document).ready(function(){
 			window.location.href = "/api/savedcomments" + newComment.newsId;
 		});
 	},
-	
+
+	$('#')
+
 })
 
 
