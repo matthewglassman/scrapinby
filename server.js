@@ -50,80 +50,70 @@ app.get("/scrapeit", function(req, res){
 	
 	var result = [];
 	
-	request(url, function(err, resp, body){
-		var $ = cheerio.load(body); //load the body of the document into Cheerio and assign it to $
+	request(url, function(err, resp, html){
+		var $ = cheerio.load(html); //load the body of the document into Cheerio and assign it to $
 
 		$("article").each(function(i, element){
 			
+			var result = {};
 
-			var title = $(element).find("h4").find("a").text();
+			result.title = $(element).find("h4").find("a").text();
 
-			var link = $(element).find("h4").find("a").attr("href");
+			result.link = $(element).find("h4").find("a").attr("href");
 
-			var id = i;
+	//now need to save freshly scraped articles to db.
+			var entry = new News(result);
 
-			var scrapedNews = {
-				"title": title,
-				"link": link,
-				"id": id
-			}
-			result.push(scrapedNews);
+			console.log(entry);
+
+			entry.save(function(err, data){
+				if(err) {
+					console.log(err);
+				}else{
+					console.log(data);
+				}
+			});
 		});
-
-		var handlebarsObject = {
-			scraped: true,
-			News: result
-
-		}
-		res.render("index", handlebarsObject);
 	});
-	// now need to save freshly scraped articles to db.
-	// 		var entry = new News(result);
-
-	// 		console.log(entry);
-
-	// 		entry.save(function(err, data){
-	// 			if(err) {
-	// 				console.log(err);
-	// 			}else{
-	// 				console.log(data);
-	// 			}
-	// 		});
-	// 		// result.push({
-	// 		// 	title: title,
-	// 		// 	link: link,
-	// 		// });
-	// 	});
-	// });
-	// res.send("Done Scrapin");
+	res.redirect("/");
 });
 
+
 //save a news article
-app.post('/api/savingnews', function(req, res){
-
+app.post('/api/savednews/:id', function(req, res){
+	News.where({"_id":req.params.id}).update({$set: {saved: true}})
+		.exec(function (error, news){
+			if (error){
+				console.log(error);
+			}else{
+				res.json(news);
+			}
+		});
 	//create a new instance of the news and reviews schema
-	var entryinDB = new News(req.body);
+	//var entryinDB = new News(req.body);
 
-	News.save(function(err, doc){
-		if(err){
-			console.log(err);
-		}
-	});
+	// News.save(function(err, doc){
+	// 	if(err){
+	// 		console.log(err);
+	// 	}
+	// });
+
 });
 
 //get saved articles from the DB
 app.get("/savednews", function(req, res){
-	News.find({}, function(error, News){
-		if(error){
-			console.log(error);
-		}else{
-			var handlebarsObject = {
-				savedDIV: true,
-				KeptNews: News
+	News.find({saved: true}, function(error, News){
+		
+		// if(error){
+		// 	console.log(error);
+		// }else{
+		// 	var handlebarsObject = {
+		// 		savedDIV: true,
+		// 		KeptNews: News
 
-			};
+		// 	};
 
-			res.render("news", handbarsObject);
+			res.render("news", {News: News});
 		}
 	});
 });
