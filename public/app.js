@@ -58,4 +58,16 @@ $(document).on("click", "#remove", function(){
 	});
 });
 
-//Save a Comment to an article
+//Save a Comment to database
+$(document).on("click", "#save", function(){
+	var commentId = $(this).attr("data-id:");
+	$.ajax({
+		method: "POST",
+		url: "/api/comments/" + commentId,
+		data: {
+
+		}
+	}).done(function(data){
+		console.log(data);
+	});
+});
