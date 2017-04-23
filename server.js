@@ -1,5 +1,5 @@
 var express = require("express");
-var exphbs = require('express-handlebars');
+var exphbs = require("express-handlebars");
 var bodyParser = require("body-parser");
 var request = require("request");
 var cheerio = require("cheerio");
@@ -15,7 +15,7 @@ mongoose.Promise = Promise;
 var app = express();
 
 app.use(bodyParser.urlencoded({extended:false}));
-app.engine("handlebars", exphbs({deafultLayout: "main"}));
+app.engine("handlebars", exphbs({defaultLayout: "main"}));
 app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
@@ -114,9 +114,9 @@ app.get("/savednews", function(req, res){
 		// 	};
 
 			res.render("news", {News: News});
-		}
+		});
 	});
-});
+//});
 
 //route for saving comments
 app.post("/api/comments/:id", function(req, res){
