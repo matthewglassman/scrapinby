@@ -27,15 +27,20 @@
 // });
 
 //save an article to database
-$(document).on("click", "#save", function() {
+$(document).on("click", "#save", function(e) {
+	e.preventDefault();
+
+	$(this).attr("data-status", true);
+
 	var newsId = $(this).attr("data-id");
 
 	$.ajax({
 		method: "POST",
 		url: "/api/savednews/" + newsId,
 		data: {
-			title: $("#newstitle").val(),
-			link: $("#newslink").val()
+			// title: $("#newstitle").val(),
+			// link: $("#newslink").val()
+			saved: true
 		}
 	}).done(function(data){
 		console.log(data);
@@ -43,31 +48,44 @@ $(document).on("click", "#save", function() {
 });
 
 //delete an article from database
-$(document).on("click", "#remove", function(){
+$(document).on("click", "#remove", function(e){
+	
+	$("this").attr("data-status", false);
+
 	var newsId = $(this).attr("data-id");
 
 	$.ajax({
 		method: "POST",
 		url: "/api/removenews/" + newsId,
 		data: {
-			title: $("#newstitle").val(),
-			link: $("newslink").val()
+			// title: $("#newstitle").val(),
+			// link: $("newslink").val()
+			saved: false
 		}
 	}).done(function(data){
 		console.log(data);
 	});
 });
 
+
 //Save a Comment to database
-$(document).on("click", "#save", function(){
+$(document).on("click", "#save", function(e){
+	e.preventDefault();
+
 	var commentId = $(this).attr("data-id:");
+	
 	$.ajax({
 		method: "POST",
 		url: "/api/comments/" + commentId,
 		data: {
+			title: $("#newstitle").val(),
+			body: $("commentbody").val()
 
 		}
 	}).done(function(data){
+		$(".addComment").empty();
 		console.log(data);
 	});
+	$("#commenttitle").val("");
+	$("#commentbody").val("");
 });

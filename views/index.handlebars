@@ -21,6 +21,7 @@
 
 <div>
 	{{#each News}}
+	{{#unless saved}}
 		<div class="panel panel-primary">
 
  	 		<div class="panel-body" id="news">
@@ -32,6 +33,7 @@
   			{{this.link}}
   			</div>
 		</div>
+	{{/unless}}
 	{{/each}}
 </div>
 

@@ -40,7 +40,14 @@ db.once("open", function(){
 
 //When user requests the root, this route gets request and returns index or index.handlebars in this case.
 app.get("/", function (req, res){
-	res.render("index");
+	News.find({}).sort({$natural:-1}).limit(15).exec(function(error, doc){
+		if (error){
+			console.log(error);
+		} else {
+			console.log(doc);
+			res.render("index", {News: doc});
+		}
+	});
 });
 
 
@@ -48,7 +55,7 @@ app.get("/", function (req, res){
 app.get("/scrapeit", function(req, res){
 	var url = "http://www.newsobserver.com/news/local/"; //website to scrape
 	
-	var result = [];
+	// result = [];
 	
 	request(url, function(err, resp, html){
 		var $ = cheerio.load(html); //load the body of the document into Cheerio and assign it to $
@@ -66,11 +73,11 @@ app.get("/scrapeit", function(req, res){
 
 			console.log(entry);
 
-			entry.save(function(err, data){
+			entry.save(function(err, doc){
 				if(err) {
 					console.log(err);
 				}else{
-					console.log(data);
+					console.log(doc);
 				}
 			});
 		});
@@ -102,8 +109,12 @@ app.post('/api/savednews/:id', function(req, res){
 
 //get saved articles from the DB
 app.get("/savednews", function(req, res){
-	News.find({saved: true}, function(error, News){
-		
+	News.find({saved: true}, function(error, doc){
+		if(error){
+			console.log(error);
+		} else {
+			res.render("news", {News: doc});
+		}
 		// if(error){
 		// 	console.log(error);
 		// }else{
@@ -113,7 +124,6 @@ app.get("/savednews", function(req, res){
 
 		// 	};
 
-			res.render("news", {News: News});
 		});
 	});
 //});
@@ -121,20 +131,20 @@ app.get("/savednews", function(req, res){
 //route for saving comments
 app.post("/api/comments/:id", function(req, res){
 
-	var newComment = new Comment(req.body);
-	var id = req.params.id;
+	var newComment = new Comments(req.body);
+	//var id = req.params.id;
 
-	newComment.save(function(error, comment){
+	newComment.save(function(error, doc){
 		if(error){
-			console.log("You tried to save a comment but " + error);
+			console.log(error);
 		}else{
 			//find News Story to associate with this comment and update it with a new comment
-			News.findOneAndUpdate({"_id":req.params.id}, {$push: {"comments": doc._id}}, {new: true})
-			.exec(function(error, comment){
+			News.findOneAndUpdate({"_id":req.params.id}, {"comments": doc._id}) //{$push: {"comments": doc._id}}, {new: true})
+			.exec(function(error, doc){
 				if (error){
-					console.log(err);
+					console.log(error);
 				}else{
-					console.log(comment);
+					res.send(doc);
 				}
 			});
 		}
@@ -144,13 +154,13 @@ app.post("/api/comments/:id", function(req, res){
 //route for returning saved comments and news article for a news item
 app.get("/api/savedcomment/:id", function(req, res){
 	News.findOne({"_id": req.params.id})
-	.populate("comments")
-	.exec(function(error, article){
+	.populate("savedcomment")
+	.exec(function(error, doc){
 		if (error){
 			console.log(error);
 		}else{
-			sonsole.log(article)
-			res.json(article)
+			console.log(doc);
+			res.json(doc);
 		}
 	});
 });
